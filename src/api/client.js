@@ -10,13 +10,18 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+let redirecting = false
 api.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err.response?.status === 401) {
+      const hadToken = !!localStorage.getItem('le_token')
       localStorage.removeItem('le_token')
       localStorage.removeItem('le_user')
-      window.location.href = '/login'
+      if (hadToken && !redirecting) {
+        redirecting = true
+        window.location.href = '/login'
+      }
     }
     return Promise.reject(err)
   }

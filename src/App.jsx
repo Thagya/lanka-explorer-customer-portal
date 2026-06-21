@@ -1,5 +1,26 @@
+import { Component } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext.jsx'
+
+class ErrorBoundary extends Component {
+  state = { error: null }
+  static getDerivedStateFromError(error) { return { error } }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ padding: '2rem', textAlign: 'center', fontFamily: 'system-ui' }}>
+          <h2 style={{ color: '#1F4E4E' }}>Something went wrong</h2>
+          <p style={{ color: '#666', margin: '0.5rem 0 1.5rem' }}>{this.state.error.message}</p>
+          <button onClick={() => { this.setState({ error: null }); window.location.href = '/' }}
+            style={{ background: '#1F4E4E', color: '#fff', border: 'none', padding: '0.5rem 1.5rem', borderRadius: '8px', cursor: 'pointer' }}>
+            Go Home
+          </button>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
 import { FavouritesProvider } from './contexts/FavouritesContext.jsx'
 import FavouritesPage from './pages/FavouritesPage.jsx'
 import Layout from './components/layout/Layout.jsx'
@@ -16,6 +37,7 @@ import ProfilePage from './pages/ProfilePage.jsx'
 
 export default function App() {
   return (
+    <ErrorBoundary>
     <BrowserRouter>
       <AuthProvider>
         <FavouritesProvider>
@@ -35,5 +57,6 @@ export default function App() {
         </FavouritesProvider>
       </AuthProvider>
     </BrowserRouter>
+    </ErrorBoundary>
   )
 }
