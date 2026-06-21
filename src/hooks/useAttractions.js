@@ -14,10 +14,7 @@ export function useAttractions(params = {}) {
         if (!Array.isArray(data)) throw new Error('Unexpected response from server')
         setAttractions(data)
       })
-      .catch(err => {
-        console.error('useAttractions error:', err?.message, err?.response?.status, err?.response?.data)
-        setError(err.response?.data?.message || 'Failed to load. Please refresh.')
-      })
+      .catch(err => setError(err.response?.data?.message || 'Failed to load. Please refresh.'))
       .finally(() => setLoading(false))
   }, [JSON.stringify(params)])
 
