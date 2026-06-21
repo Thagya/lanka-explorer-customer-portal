@@ -27,7 +27,7 @@ function StarPicker({ value, onChange }) {
 export default function BookingDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { booking, loading, actionLoading, doAction } = useBooking(id)
+  const { booking, loading, error: bookingError, actionLoading, doAction } = useBooking(id)
   const [showPayment, setShowPayment] = useState(false)
   const [actionError, setActionError] = useState('')
   const [reviewForm, setReviewForm] = useState({ rating: 0, comment: '' })
@@ -41,7 +41,7 @@ export default function BookingDetailPage() {
       await doAction(action, payload)
       setShowPayment(false)
     } catch (err) {
-      setActionError(err.message)
+      setActionError(err.response?.data?.message || err.message || 'Action failed')
     }
   }
 
@@ -64,7 +64,8 @@ export default function BookingDetailPage() {
   }
 
   if (loading) return <div className="flex justify-center py-24"><Spinner className="w-12 h-12" /></div>
-  if (!booking) return <div className="text-center py-24 text-gray-500">Booking not found.</div>
+  if (bookingError) return <div className="text-center py-24 text-gray-500">{bookingError === 'Not found' ? 'Booking not found.' : 'Failed to load booking. Please try again.'}</div>
+  if (!booking) return null
 
   const { status, listingName, type, customer, details, pricing, payment, history } = booking
 
@@ -168,7 +169,7 @@ export default function BookingDetailPage() {
                   className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
                 />
               </div>
-              {reviewError && <p className="text-red-500 text-sm">{reviewError}</p>}
+              {reviewError && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-3 py-2">{reviewError}</p>}
               <Button type="submit" disabled={reviewLoading}>
                 {reviewLoading ? <Spinner className="w-4 h-4" /> : 'Submit Review'}
               </Button>

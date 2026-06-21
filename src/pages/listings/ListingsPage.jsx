@@ -8,7 +8,7 @@ export default function ListingsPage() {
   const [searchParams] = useSearchParams()
   const [type, setType] = useState(searchParams.get('type') || '')
 
-  const { listings, loading } = useListings(type ? { type } : {})
+  const { listings, loading, error } = useListings(type ? { type } : {})
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6">
@@ -16,6 +16,11 @@ export default function ListingsPage() {
       <p className="text-gray-500 text-sm mb-6">Hotels, guided tours, and vehicle rentals</p>
 
       <ListingFilter type={type} onType={setType} />
+      {error && !loading && (
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-2xl px-4 py-3 text-sm mb-4">
+          Failed to load listings. Please try again.
+        </div>
+      )}
       <ListingGrid listings={listings} loading={loading} />
     </div>
   )

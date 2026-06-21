@@ -5,15 +5,25 @@ import { useAuth } from '../contexts/AuthContext.jsx'
 import AttractionCard from '../components/attractions/AttractionCard.jsx'
 import ListingCard from '../components/listings/ListingCard.jsx'
 import Button from '../components/ui/Button.jsx'
+import Spinner from '../components/ui/Spinner.jsx'
 
 export default function FavouritesPage() {
   const { user } = useAuth()
-  const { attractions, listings } = useFavourites()
+  const { attractions, listings, loading, error } = useFavourites()
 
   if (!user) return (
     <div className="text-center py-24">
       <p className="text-gray-600 mb-4">Please sign in to view your favourites.</p>
       <Link to="/login"><Button>Sign In</Button></Link>
+    </div>
+  )
+
+  if (loading) return <div className="flex justify-center py-24"><Spinner className="w-12 h-12" /></div>
+
+  if (error) return (
+    <div className="max-w-5xl mx-auto px-4 py-6">
+      <h1 className="text-2xl font-bold text-teal-500 mb-6">My Favourites</h1>
+      <div className="bg-red-50 border border-red-200 text-red-700 rounded-2xl px-4 py-3 text-sm">{error}</div>
     </div>
   )
 

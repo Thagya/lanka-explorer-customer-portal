@@ -43,12 +43,13 @@ export default function PaymentForm({ totalAmount, onSubmit, onCancel, loading }
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="block text-xs font-medium text-gray-700 mb-1">Amount Paid (LKR)</label>
-          <input type="number" value={form.paidAmount} onChange={set('paidAmount')} required
+          <input type="number" value={form.paidAmount} onChange={set('paidAmount')} required min="1"
             className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
         </div>
         <div>
           <label className="block text-xs font-medium text-gray-700 mb-1">Payment Date</label>
           <input type="date" value={form.paidDate} onChange={set('paidDate')} required
+            max={new Date().toISOString().split('T')[0]}
             className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
         </div>
       </div>

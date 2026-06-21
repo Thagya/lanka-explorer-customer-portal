@@ -12,15 +12,20 @@ export default function AttractionDetailPage() {
   const navigate = useNavigate()
   const [attraction, setAttraction] = useState(null)
   const [loading, setLoading] = useState(true)
-  const { isFav, toggle } = useFavourites()
+  const [fetchError, setFetchError] = useState('')
+  const { isFav, toggle, error: favError } = useFavourites()
   const { user } = useAuth()
 
   useEffect(() => {
-    getAttraction(id).then(({ data }) => setAttraction(data)).finally(() => setLoading(false))
+    setFetchError('')
+    getAttraction(id)
+      .then(({ data }) => setAttraction(data))
+      .catch(err => setFetchError(err.response?.status === 404 ? 'Attraction not found.' : 'Failed to load attraction. Please try again.'))
+      .finally(() => setLoading(false))
   }, [id])
 
   if (loading) return <div className="flex justify-center py-24"><Spinner className="w-12 h-12" /></div>
-  if (!attraction) return <div className="text-center py-24 text-gray-500">Attraction not found.</div>
+  if (fetchError) return <div className="text-center py-24 text-gray-500">{fetchError}</div>
 
   const hasCoords = attraction.lat && attraction.lng
   const mapsUrl = hasCoords
@@ -29,6 +34,10 @@ export default function AttractionDetailPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
+      {favError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-2xl px-4 py-2.5 text-sm mb-3">{favError}</div>
+      )}
+
       <div className="flex items-center justify-between mb-4">
         <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-teal-500 text-sm hover:underline">
           <ArrowLeft size={16} /> Back

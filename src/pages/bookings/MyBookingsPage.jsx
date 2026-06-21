@@ -8,7 +8,7 @@ import Spinner from '../../components/ui/Spinner.jsx'
 
 export default function MyBookingsPage() {
   const { user } = useAuth()
-  const { bookings, loading } = useMyBookings()
+  const { bookings, loading, error } = useMyBookings()
 
   if (!user) return (
     <div className="text-center py-24">
@@ -24,17 +24,23 @@ export default function MyBookingsPage() {
       <h1 className="text-2xl font-bold text-teal-500 mb-1">My Bookings</h1>
       <p className="text-gray-500 text-sm mb-6">Manage your reservations</p>
 
-      {bookings.length === 0 ? (
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-2xl px-4 py-3 text-sm mb-4">
+          Failed to load bookings. Please refresh and try again.
+        </div>
+      )}
+
+      {!error && bookings.length === 0 ? (
         <div className="text-center py-16">
           <CalendarDays size={48} className="text-gray-300 mx-auto mb-4" />
           <p className="text-gray-500 mb-4">No bookings yet.</p>
           <Link to="/listings"><Button>Explore Listings</Button></Link>
         </div>
-      ) : (
+      ) : !error ? (
         <div className="space-y-4">
           {bookings.map(b => <BookingCard key={b._id} booking={b} />)}
         </div>
-      )}
+      ) : null}
     </div>
   )
 }

@@ -37,7 +37,10 @@ export default function BookingFormPage() {
   })
 
   useEffect(() => {
-    getListing(listingId).then(({ data }) => setListing(data)).finally(() => setLoading(false))
+    getListing(listingId)
+      .then(({ data }) => setListing(data))
+      .catch(err => setError(err.response?.status === 404 ? 'Listing not found.' : 'Failed to load listing. Please go back and try again.'))
+      .finally(() => setLoading(false))
   }, [listingId])
 
   const set = (k) => (e) => {
@@ -60,7 +63,7 @@ export default function BookingFormPage() {
   }
 
   if (loading) return <div className="flex justify-center py-24"><Spinner className="w-12 h-12" /></div>
-  if (!listing) return <div className="text-center py-24 text-gray-500">Listing not found.</div>
+  if (!listing) return <div className="text-center py-24 text-gray-500">{error || 'Listing not found.'}</div>
 
   const type = listing.listingType
 

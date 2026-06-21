@@ -15,7 +15,7 @@ export default function AttractionsPage() {
   if (category !== 'All') params.category = category
   if (debouncedSearch)    params.search   = debouncedSearch
 
-  const { attractions, loading } = useAttractions(params)
+  const { attractions, loading, error } = useAttractions(params)
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6">
@@ -26,6 +26,11 @@ export default function AttractionsPage() {
         search={search}    onSearch={setSearch}
         category={category} onCategory={setCategory}
       />
+      {error && !loading && (
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-2xl px-4 py-3 text-sm mb-4">
+          Failed to load attractions. Please try again.
+        </div>
+      )}
       <AttractionGrid attractions={attractions} loading={loading} />
     </div>
   )

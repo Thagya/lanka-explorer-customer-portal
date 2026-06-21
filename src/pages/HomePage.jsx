@@ -21,8 +21,8 @@ export default function HomePage() {
   const [search, setSearch] = useState('')
   const navigate = useNavigate()
 
-  const { attractions, loading: attractionsLoading } = useAttractions()
-  const { listings,    loading: listingsLoading }    = useListings()
+  const { attractions, loading: attractionsLoading, error: attractionsError } = useAttractions()
+  const { listings,    loading: listingsLoading,    error: listingsError }    = useListings()
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -88,6 +88,8 @@ export default function HomePage() {
 
         {attractionsLoading ? (
           <div className="flex justify-center py-12"><Spinner className="w-8 h-8" /></div>
+        ) : attractionsError ? (
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-2xl px-4 py-3 text-sm">Failed to load destinations. Please refresh.</div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {attractions.slice(0, 3).map(a => (
@@ -115,6 +117,8 @@ export default function HomePage() {
 
           {listingsLoading ? (
             <div className="flex justify-center py-12"><Spinner className="w-8 h-8" /></div>
+          ) : listingsError ? (
+            <div className="bg-red-50 border border-red-200 text-red-700 rounded-2xl px-4 py-3 text-sm">Failed to load listings. Please refresh.</div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {listings.slice(0, 3).map(l => (
