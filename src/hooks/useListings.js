@@ -10,8 +10,11 @@ export function useListings(params = {}) {
     setLoading(true)
     setError(null)
     getListings(params)
-      .then(({ data }) => setListings(Array.isArray(data) ? data : []))
-      .catch(err => setError(err.response?.data?.message || 'Failed to load'))
+      .then(({ data }) => {
+        if (!Array.isArray(data)) throw new Error('Unexpected response from server')
+        setListings(data)
+      })
+      .catch(err => setError(err.response?.data?.message || 'Failed to load. Please refresh.'))
       .finally(() => setLoading(false))
   }, [JSON.stringify(params)])
 
