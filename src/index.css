@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  --color-teal-500: #1F4E4E;
+  --color-teal-400: #2a6b6b;
+  --color-teal-600: #163838;
+  --color-sand: #FAF6F0;
+  --color-terracotta: #E07856;
+  --color-gold: #C9A96A;
+}
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, sans-serif; background: #FAF6F0; color: #1a1a1a; }
+  img { display: block; max-width: 100%; }
+}

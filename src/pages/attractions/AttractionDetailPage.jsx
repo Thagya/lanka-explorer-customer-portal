@@ -1,0 +1,117 @@
+import { useEffect, useState } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { MapPin, Clock, Ticket, Tag, ArrowLeft, ExternalLink } from 'lucide-react'
+import { getAttraction } from '../../api/attractions.js'
+import ImageGallery from '../../components/ui/ImageGallery.jsx'
+import Spinner from '../../components/ui/Spinner.jsx'
+
+export default function AttractionDetailPage() {
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const [attraction, setAttraction] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    getAttraction(id).then(({ data }) => setAttraction(data)).finally(() => setLoading(false))
+  }, [id])
+
+  if (loading) return <div className="flex justify-center py-24"><Spinner className="w-12 h-12" /></div>
+  if (!attraction) return <div className="text-center py-24 text-gray-500">Attraction not found.</div>
+
+  const hasCoords = attraction.lat && attraction.lng
+  const mapsUrl = hasCoords
+    ? `https://www.openstreetmap.org/?mlat=${attraction.lat}&mlon=${attraction.lng}#map=14/${attraction.lat}/${attraction.lng}`
+    : `https://www.openstreetmap.org/search?query=${encodeURIComponent(attraction.name + ' Sri Lanka')}`
+
+  return (
+    <div className="max-w-4xl mx-auto px-4 py-6">
+      <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-teal-500 text-sm mb-4 hover:underline">
+        <ArrowLeft size={16} /> Back
+      </button>
+
+      <div className="md:grid md:grid-cols-5 md:gap-8">
+        {/* Gallery */}
+        <div className="md:col-span-3">
+          <ImageGallery images={attraction.images} alt={attraction.name} />
+
+          {/* Embedded map below gallery */}
+          {hasCoords && (
+            <div className="mt-4 rounded-2xl overflow-hidden border border-gray-200">
+              <iframe
+                title={`Map of ${attraction.name}`}
+                src={`https://www.openstreetmap.org/export/embed.html?bbox=${attraction.lng - 0.05},${attraction.lat - 0.05},${attraction.lng + 0.05},${attraction.lat + 0.05}&layer=mapnik&marker=${attraction.lat},${attraction.lng}`}
+                className="w-full h-52 border-0"
+                loading="lazy"
+              />
+              <a
+                href={mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-teal-600 hover:bg-gray-50 transition-colors border-t border-gray-200"
+              >
+                <ExternalLink size={12} /> Open in OpenStreetMap
+              </a>
+            </div>
+          )}
+        </div>
+
+        {/* Details */}
+        <div className="md:col-span-2 mt-6 md:mt-0">
+          <span className="inline-block bg-teal-500/10 text-teal-500 text-xs font-semibold px-3 py-1 rounded-full mb-3">
+            {attraction.category}
+          </span>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">{attraction.name}</h1>
+          <div className="flex items-center gap-4 text-sm text-gray-500 mb-2">
+            <span className="flex items-center gap-1"><MapPin size={14} /> {attraction.region}</span>
+          </div>
+          <p className="text-gray-700 text-sm mb-5 leading-relaxed">{attraction.description}</p>
+
+          <div className="space-y-3 text-sm">
+            {attraction.openingHours && (
+              <div className="flex items-start gap-2">
+                <Clock size={16} className="text-teal-500 mt-0.5" />
+                <div><p className="font-medium text-gray-700">Opening Hours</p><p className="text-gray-600">{attraction.openingHours}</p></div>
+              </div>
+            )}
+            {attraction.entryFee && (
+              <div className="flex items-start gap-2">
+                <Ticket size={16} className="text-teal-500 mt-0.5" />
+                <div><p className="font-medium text-gray-700">Entry Fee</p><p className="text-gray-600">{attraction.entryFee}</p></div>
+              </div>
+            )}
+            {(attraction.address || hasCoords) && (
+              <div className="flex items-start gap-2">
+                <MapPin size={16} className="text-teal-500 mt-0.5" />
+                <div>
+                  <p className="font-medium text-gray-700">Location</p>
+                  <p className="text-gray-600">{attraction.address || attraction.region + ', Sri Lanka'}</p>
+                  <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-teal-500 hover:underline mt-0.5 inline-block">View on map →</a>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {attraction.tags?.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-5">
+              {attraction.tags.map(t => (
+                <span key={t} className="flex items-center gap-1 bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-full">
+                  <Tag size={10} /> {t}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* No booking button — attractions are destinations, not bookable */}
+          <a
+            href={mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-6 w-full flex items-center justify-center gap-2 bg-teal-500 hover:bg-teal-600 text-white font-medium py-3 px-4 rounded-xl transition-colors text-sm"
+          >
+            <MapPin size={16} /> View on Map
+          </a>
+        </div>
+      </div>
+    </div>
+  )
+}
