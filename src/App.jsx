@@ -9,13 +9,10 @@ class ErrorBoundary extends Component {
   render() {
     if (this.state.error) {
       return (
-        <div style={{ padding: '2rem', fontFamily: 'system-ui', maxWidth: '800px', margin: '0 auto' }}>
+        <div style={{ padding: '2rem', textAlign: 'center', fontFamily: 'system-ui' }}>
           <h2 style={{ color: '#1F4E4E' }}>Something went wrong</h2>
-          <p style={{ color: '#666', margin: '0.5rem 0' }}>{this.state.error.message}</p>
-          <pre style={{ background: '#f5f5f5', padding: '1rem', fontSize: '11px', overflowX: 'auto', borderRadius: '8px', marginBottom: '1rem' }}>
-            {this.state.info?.componentStack}
-          </pre>
-          <button onClick={() => { this.setState({ error: null }); window.location.href = '/' }}
+          <p style={{ color: '#666', margin: '0.5rem 0 1.5rem' }}>Please try refreshing the page.</p>
+          <button onClick={() => { this.setState({ error: null, info: null }); window.location.href = '/' }}
             style={{ background: '#1F4E4E', color: '#fff', border: 'none', padding: '0.5rem 1.5rem', borderRadius: '8px', cursor: 'pointer' }}>
             Go Home
           </button>

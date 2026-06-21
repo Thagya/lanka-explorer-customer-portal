@@ -10,7 +10,7 @@ export function useAttractions(params = {}) {
     setLoading(true)
     setError(null)
     getAttractions(params)
-      .then((res) => { console.log('attractions res:', typeof res.data, Array.isArray(res.data), JSON.stringify(res.data).substring(0,100)); setAttractions(res.data) })
+      .then(({ data }) => setAttractions(Array.isArray(data) ? data : []))
       .catch(err => setError(err.response?.data?.message || 'Failed to load'))
       .finally(() => setLoading(false))
   }, [JSON.stringify(params)])
