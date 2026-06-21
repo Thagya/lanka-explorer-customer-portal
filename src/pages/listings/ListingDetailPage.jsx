@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { MapPin, ArrowLeft, Check, ExternalLink, Star } from 'lucide-react'
+import { MapPin, ArrowLeft, Check, ExternalLink, Star, Heart } from 'lucide-react'
 import { getListing } from '../../api/listings.js'
 import api from '../../api/client.js'
 import { useAuth } from '../../contexts/AuthContext.jsx'
+import { useFavourites } from '../../contexts/FavouritesContext.jsx'
 import ImageGallery from '../../components/ui/ImageGallery.jsx'
 import Button from '../../components/ui/Button.jsx'
 import Spinner from '../../components/ui/Spinner.jsx'
@@ -24,6 +25,7 @@ export default function ListingDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
+  const { isFav, toggle } = useFavourites()
   const [listing, setListing] = useState(null)
   const [loading, setLoading] = useState(true)
   const [reviews, setReviews] = useState([])
@@ -50,9 +52,24 @@ export default function ListingDetailPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
-      <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-teal-500 text-sm mb-4 hover:underline">
-        <ArrowLeft size={16} /> Back
-      </button>
+      <div className="flex items-center justify-between mb-4">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-teal-500 text-sm hover:underline">
+          <ArrowLeft size={16} /> Back
+        </button>
+        {user && (
+          <button
+            onClick={() => toggle(id, 'listing')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm font-medium transition-colors ${
+              isFav(id)
+                ? 'bg-red-50 border-red-200 text-red-500'
+                : 'bg-white border-gray-200 text-gray-500 hover:border-red-200 hover:text-red-400'
+            }`}
+          >
+            <Heart size={15} className={isFav(id) ? 'fill-red-500 text-red-500' : ''} />
+            {isFav(id) ? 'Saved' : 'Save'}
+          </button>
+        )}
+      </div>
 
       <div className="md:grid md:grid-cols-5 md:gap-8">
         <div className="md:col-span-3">

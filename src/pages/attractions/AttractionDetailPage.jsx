@@ -1,15 +1,19 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { MapPin, Clock, Ticket, Tag, ArrowLeft, ExternalLink } from 'lucide-react'
+import { MapPin, Clock, Ticket, Tag, ArrowLeft, ExternalLink, Heart } from 'lucide-react'
 import { getAttraction } from '../../api/attractions.js'
 import ImageGallery from '../../components/ui/ImageGallery.jsx'
 import Spinner from '../../components/ui/Spinner.jsx'
+import { useFavourites } from '../../contexts/FavouritesContext.jsx'
+import { useAuth } from '../../contexts/AuthContext.jsx'
 
 export default function AttractionDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [attraction, setAttraction] = useState(null)
   const [loading, setLoading] = useState(true)
+  const { isFav, toggle } = useFavourites()
+  const { user } = useAuth()
 
   useEffect(() => {
     getAttraction(id).then(({ data }) => setAttraction(data)).finally(() => setLoading(false))
@@ -25,9 +29,24 @@ export default function AttractionDetailPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
-      <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-teal-500 text-sm mb-4 hover:underline">
-        <ArrowLeft size={16} /> Back
-      </button>
+      <div className="flex items-center justify-between mb-4">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-teal-500 text-sm hover:underline">
+          <ArrowLeft size={16} /> Back
+        </button>
+        {user && (
+          <button
+            onClick={() => toggle(id, 'attraction')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm font-medium transition-colors ${
+              isFav(id)
+                ? 'bg-red-50 border-red-200 text-red-500'
+                : 'bg-white border-gray-200 text-gray-500 hover:border-red-200 hover:text-red-400'
+            }`}
+          >
+            <Heart size={15} className={isFav(id) ? 'fill-red-500 text-red-500' : ''} />
+            {isFav(id) ? 'Saved' : 'Save'}
+          </button>
+        )}
+      </div>
 
       <div className="md:grid md:grid-cols-5 md:gap-8">
         {/* Gallery */}
