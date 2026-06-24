@@ -26,6 +26,7 @@ export default function ListingCard({ listing }) {
             src={images?.[0]}
             alt={name}
             className="w-full h-48 object-cover transition-transform duration-300 hover:scale-105"
+            onError={e => { e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 width%3D%22400%22 height%3D%22200%22%3E%3Crect width%3D%22400%22 height%3D%22200%22 fill%3D%22%23f3f4f6%22%2F%3E%3Ctext x%3D%22200%22 y%3D%22105%22 font-family%3D%22sans-serif%22 font-size%3D%2213%22 fill%3D%22%239ca3af%22 text-anchor%3D%22middle%22%3EImage not available%3C%2Ftext%3E%3C%2Fsvg%3E'; e.currentTarget.onerror = null }}
           />
           <span className="absolute top-3 left-3 bg-teal-500 text-white text-xs font-semibold px-2.5 py-1 rounded-full capitalize flex items-center gap-1">
             {TYPE_ICONS[listingType]} {listingType}
