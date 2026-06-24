@@ -121,7 +121,6 @@ export default function AttractionDetailPage() {
                 <div>
                   <p className="font-medium text-gray-700">Location</p>
                   <p className="text-gray-600">{attraction.address || attraction.region + ', Sri Lanka'}</p>
-                  <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-teal-500 hover:underline mt-0.5 inline-block">View on map →</a>
                 </div>
               </div>
             )}
