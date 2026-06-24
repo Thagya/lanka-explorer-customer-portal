@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { MapPin, ArrowLeft, Check, ExternalLink, Star, Heart } from 'lucide-react'
+import { MapPin, ArrowLeft, Check, Navigation, Car, Star, Heart } from 'lucide-react'
 import { getListing } from '../../api/listings.js'
 import api from '../../api/client.js'
 import { useAuth } from '../../contexts/AuthContext.jsx'
@@ -101,20 +101,52 @@ export default function ListingDetailPage() {
             </div>
           )}
 
-          <div className="flex items-start gap-2 mb-4">
-            <MapPin size={15} className="text-teal-500 mt-0.5 shrink-0" />
-            <div>
-              <p className="text-gray-700 text-sm font-medium">{listing.address || listing.region + ', Sri Lanka'}</p>
-              <a
-                href={`https://www.openstreetmap.org/search?query=${encodeURIComponent((listing.address || listing.region) + ' Sri Lanka')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-teal-500 hover:underline inline-flex items-center gap-1 mt-0.5"
-              >
-                <ExternalLink size={11} /> View on map
-              </a>
-            </div>
-          </div>
+          {(() => {
+            const address = listing.address || listing.region + ', Sri Lanka'
+            const isMobile = /android|iphone|ipad|ipod/i.test(navigator.userAgent)
+            const mapsLink = isMobile
+              ? `geo:0,0?q=${encodeURIComponent(address)}`
+              : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`
+
+            if (listing.listingType === 'vehicle') {
+              return (
+                <div className="mb-4">
+                  <div className="flex items-start gap-2 mb-2">
+                    <Car size={15} className="text-teal-500 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-0.5">Pickup Location</p>
+                      <p className="text-gray-700 text-sm font-medium">{address}</p>
+                    </div>
+                  </div>
+                  <a
+                    href={mapsLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-teal-600 bg-teal-50 border border-teal-100 px-3 py-1.5 rounded-lg hover:bg-teal-100 transition-colors"
+                  >
+                    <Navigation size={12} /> Get to Pickup Point
+                  </a>
+                </div>
+              )
+            }
+
+            return (
+              <div className="flex items-start gap-2 mb-4">
+                <MapPin size={15} className="text-teal-500 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-gray-700 text-sm font-medium">{address}</p>
+                  <a
+                    href={mapsLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-teal-600 hover:underline mt-0.5"
+                  >
+                    <Navigation size={11} /> Get Directions
+                  </a>
+                </div>
+              </div>
+            )
+          })()}
 
           <p className="text-gray-700 text-sm mb-5 leading-relaxed">{listing.description}</p>
 
