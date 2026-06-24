@@ -170,14 +170,6 @@ export default function AttractionDetailPage() {
                   </button>
                 </>
               )}
-              <a
-                href={mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2 text-gray-500 hover:text-teal-600 text-sm py-2 transition-colors"
-              >
-                <ExternalLink size={13} /> View on OpenStreetMap
-              </a>
             </div>
           )}
 
