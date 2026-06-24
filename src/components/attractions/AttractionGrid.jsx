@@ -1,8 +1,9 @@
 import AttractionCard from './AttractionCard.jsx'
 import Spinner from '../ui/Spinner.jsx'
 import { MapPin } from 'lucide-react'
+import { haversineKm } from '../../utils/distance.js'
 
-export default function AttractionGrid({ attractions, loading }) {
+export default function AttractionGrid({ attractions, loading, userLocation }) {
   if (loading) {
     return (
       <div className="flex justify-center py-20">
@@ -21,10 +22,29 @@ export default function AttractionGrid({ attractions, loading }) {
     )
   }
 
+  // Attach distance to each attraction when user location is known
+  let items = attractions.map(a => ({
+    attraction: a,
+    distanceKm:
+      userLocation && a.lat && a.lng
+        ? haversineKm(userLocation.lat, userLocation.lng, a.lat, a.lng)
+        : null,
+  }))
+
+  // Sort by distance (attractions without coords go last)
+  if (userLocation) {
+    items = items.sort((a, b) => {
+      if (a.distanceKm == null && b.distanceKm == null) return 0
+      if (a.distanceKm == null) return 1
+      if (b.distanceKm == null) return -1
+      return a.distanceKm - b.distanceKm
+    })
+  }
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-      {attractions.map(a => (
-        <AttractionCard key={a._id} attraction={a} />
+      {items.map(({ attraction, distanceKm }) => (
+        <AttractionCard key={attraction._id} attraction={attraction} distanceKm={distanceKm} />
       ))}
     </div>
   )

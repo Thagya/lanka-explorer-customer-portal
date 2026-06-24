@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { MapPin, Clock, Ticket, Tag, ArrowLeft, ExternalLink, Heart } from 'lucide-react'
+import { MapPin, Clock, Ticket, Tag, ArrowLeft, ExternalLink, Heart, Navigation, LocateFixed } from 'lucide-react'
 import { getAttraction } from '../../api/attractions.js'
 import ImageGallery from '../../components/ui/ImageGallery.jsx'
 import Spinner from '../../components/ui/Spinner.jsx'
 import { useFavourites } from '../../contexts/FavouritesContext.jsx'
 import { useAuth } from '../../contexts/AuthContext.jsx'
+import { useGeolocation } from '../../hooks/useGeolocation.js'
+import { haversineKm, formatDistance, directionsUrl } from '../../utils/distance.js'
 
 export default function AttractionDetailPage() {
   const { id } = useParams()
@@ -15,6 +17,7 @@ export default function AttractionDetailPage() {
   const [fetchError, setFetchError] = useState('')
   const { isFav, toggle, error: favError } = useFavourites()
   const { user } = useAuth()
+  const { lat: userLat, lng: userLng, error: geoError, loading: geoLoading, request: requestLocation } = useGeolocation()
 
   useEffect(() => {
     setFetchError('')
@@ -31,6 +34,11 @@ export default function AttractionDetailPage() {
   const mapsUrl = hasCoords
     ? `https://www.openstreetmap.org/?mlat=${attraction.lat}&mlon=${attraction.lng}#map=14/${attraction.lat}/${attraction.lng}`
     : `https://www.openstreetmap.org/search?query=${encodeURIComponent(attraction.name + ' Sri Lanka')}`
+
+  const distanceKm =
+    hasCoords && userLat && userLng
+      ? haversineKm(userLat, userLng, attraction.lat, attraction.lng)
+      : null
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
@@ -129,15 +137,60 @@ export default function AttractionDetailPage() {
             </div>
           )}
 
-          {/* No booking button — attractions are destinations, not bookable */}
-          <a
-            href={mapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-6 w-full flex items-center justify-center gap-2 bg-teal-500 hover:bg-teal-600 text-white font-medium py-3 px-4 rounded-xl transition-colors text-sm"
-          >
-            <MapPin size={16} /> View on Map
-          </a>
+          {/* Geolocation — distance + directions */}
+          {hasCoords && (
+            <div className="mt-6 space-y-2">
+              {distanceKm != null ? (
+                <>
+                  <div className="flex items-center gap-2 bg-teal-50 border border-teal-100 rounded-xl px-4 py-2.5 text-sm text-teal-700 font-medium">
+                    <LocateFixed size={15} className="shrink-0" />
+                    {formatDistance(distanceKm)} from your location
+                  </div>
+                  <a
+                    href={directionsUrl(attraction.lat, attraction.lng, attraction.name)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-2 bg-teal-500 hover:bg-teal-600 text-white font-medium py-3 px-4 rounded-xl transition-colors text-sm"
+                  >
+                    <Navigation size={16} /> Get Directions
+                  </a>
+                </>
+              ) : (
+                <>
+                  {geoError && (
+                    <p className="text-xs text-amber-600 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2">{geoError}</p>
+                  )}
+                  <button
+                    onClick={requestLocation}
+                    disabled={geoLoading}
+                    className="w-full flex items-center justify-center gap-2 border border-teal-500 text-teal-600 hover:bg-teal-50 font-medium py-3 px-4 rounded-xl transition-colors text-sm disabled:opacity-50"
+                  >
+                    <Navigation size={16} />
+                    {geoLoading ? 'Getting location…' : 'Get Directions'}
+                  </button>
+                </>
+              )}
+              <a
+                href={mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-center gap-2 text-gray-500 hover:text-teal-600 text-sm py-2 transition-colors"
+              >
+                <ExternalLink size={13} /> View on OpenStreetMap
+              </a>
+            </div>
+          )}
+
+          {!hasCoords && (
+            <a
+              href={mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 w-full flex items-center justify-center gap-2 bg-teal-500 hover:bg-teal-600 text-white font-medium py-3 px-4 rounded-xl transition-colors text-sm"
+            >
+              <MapPin size={16} /> View on Map
+            </a>
+          )}
         </div>
       </div>
     </div>

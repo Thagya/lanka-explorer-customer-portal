@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom'
-import { MapPin, Heart } from 'lucide-react'
+import { MapPin, Heart, Navigation } from 'lucide-react'
 import Card from '../ui/Card.jsx'
 import { useFavourites } from '../../contexts/FavouritesContext.jsx'
 import { useAuth } from '../../contexts/AuthContext.jsx'
+import { formatDistance } from '../../utils/distance.js'
 
-export default function AttractionCard({ attraction }) {
+export default function AttractionCard({ attraction, distanceKm }) {
   const { _id, name, category, region, address, images, shortDescription } = attraction
   const { isFav, toggle } = useFavourites()
   const { user } = useAuth()
@@ -38,8 +39,15 @@ export default function AttractionCard({ attraction }) {
         </div>
         <div className="p-4">
           <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1">{name}</h3>
-          <div className="flex items-center gap-1 text-gray-500 text-xs mb-1">
-            <MapPin size={12} /> {region}
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-1 text-gray-500 text-xs">
+              <MapPin size={12} /> {region}
+            </div>
+            {distanceKm != null && (
+              <span className="flex items-center gap-1 text-xs font-medium text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full">
+                <Navigation size={10} /> {formatDistance(distanceKm)}
+              </span>
+            )}
           </div>
           {address && (
             <p className="text-gray-400 text-xs mb-2 line-clamp-1">{address}</p>
